@@ -21,14 +21,15 @@
          text-decoration:none;margin:10px auto;border:none;cursor:pointer}
     .btn-dl{background:#1d4ed8;color:white}
     .btn-open{background:#4A8A56;color:white}
-    .hint{font-size:12px;color:#334155;margin-top:20px;line-height:1.7}
+    .hint{font-size:12px;color:#475569;margin-top:20px;line-height:1.8}
+    .hint b{color:#94a3b8}
     .hidden{display:none}
   </style>
 </head>
 <body>
   <div class="icon">📍</div>
   <h1>GPS Tour · Vĩnh Khánh</h1>
-  <p class="sub">Quét để nghe thuyết minh & chỉ đường</p>
+  <p class="sub">Quét để nghe thuyết minh &amp; chỉ đường</p>
 
   <div id="state-loading">
     <div class="spinner"></div>
@@ -39,30 +40,30 @@
     <p style="color:#94a3b8;font-size:14px;margin-bottom:24px">
       Bạn chưa cài <strong style="color:white">GPS Tour</strong>
     </p>
-    <a id="btn-dl" class="btn btn-dl" href="#">⬇️ Tải GPS Tour APK</a>
-    <a id="btn-open" class="btn btn-open" href="#">✅ Đã cài rồi → Mở app</a>
+    <a id="btn-dl" class="btn btn-dl"
+       href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
+      ⬇️ Tải GPS Tour APK
+    </a>
+    <a id="btn-open" class="btn btn-open" href="#">
+      ✅ Đã cài rồi → Mở app
+    </a>
     <p class="hint">
       Sau khi tải về, mở file APK để cài đặt.<br>
-      Nếu bị chặn, vào <b>Cài đặt → Bảo mật</b><br>
+      Nếu bị chặn → <b>Cài đặt → Bảo mật</b><br>
       → bật <b>Cho phép cài từ nguồn khác</b>
     </p>
   </div>
 
   <script>
-    // ── CHỈ SỬA 2 DÒNG NÀY ─────────────────────────────────────
-    const APK_URL = 'LINK_GOOGLE_DRIVE_APK_CỦA_BẠN';
-    // ────────────────────────────────────────────────────────────
-
     const id     = new URLSearchParams(location.search).get('id') || '1';
     const scheme = `vinhkhanhtour://poi/${id}?autoplay=true`;
 
     document.getElementById('btn-open').href = scheme;
-    document.getElementById('btn-dl').href   = APK_URL;
 
-    // Thử mở app
+    // Thử mở app ngay
     window.location.href = scheme;
 
-    // Sau 2.5s vẫn ở trang này → chưa cài app → hiện nút tải
+    // Sau 2.5s vẫn ở trang này → chưa cài app
     setTimeout(() => {
       document.getElementById('state-loading').classList.add('hidden');
       document.getElementById('state-no-app').classList.remove('hidden');
