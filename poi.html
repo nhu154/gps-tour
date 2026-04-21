@@ -268,7 +268,7 @@
     }
 
     /* Install hint */
-    .install-hint {
+    .install-hint { text-align: center;
       margin-top: 24px;
       padding: 16px;
       border: 1px solid var(--muted2);
@@ -308,7 +308,7 @@
 
     <div class="wordmark">
       <div class="wordmark-line"></div>
-      <span class="wordmark-text">GPS Tour · Vĩnh Khánh</span>
+      <span class="wordmark-text">VinhKhanh Tour</span>
       <div class="wordmark-line"></div>
     </div>
 
@@ -317,11 +317,11 @@
       <!-- State 1: Ready -->
       <div id="state-ready">
         <p class="card-label" id="card-label">Điểm tham quan</p>
-        <h1 class="card-title" id="card-title">Mở ứng dụng<br><span>GPS Tour</span></h1>
+        <h1 class="card-title" id="card-title">Mở ứng dụng<br><span>VinhKhanh Tour</span></h1>
         <p class="card-desc" id="card-desc">Nghe thuyết minh và chỉ đường tự động ngay khi vào app.</p>
 
         <a class="btn-primary" id="btn-open-app" href="#">
-          Mở trong GPS Tour
+          Mở trong VinhKhanh Tour
         </a>
 
         <div class="divider">
@@ -332,7 +332,7 @@
 
         <a class="btn-secondary"
            href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-          Tải GPS Tour APK
+          Tải VinhKhanh Tour APK
         </a>
 
         <div class="install-hint">
@@ -349,21 +349,21 @@
       <div id="state-opening" class="hidden">
         <div class="loading-wrap">
           <div class="loader"></div>
-          <p class="loading-text">Đang mở GPS Tour</p>
+          <p class="loading-text">Đang mở VinhKhanh Tour</p>
         </div>
         <p class="loading-sub">
           Nếu không mở được, ứng dụng chưa được<br>cài trên thiết bị này.
         </p>
         <a class="btn-secondary"
            href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-          Tải GPS Tour APK
+          Tải VinhKhanh Tour APK
         </a>
         <button class="btn-ghost" onclick="goBack()">Quay lại</button>
       </div>
 
     </div>
 
-    <p class="footer">© GPS Tour · Vĩnh Khánh 2025</p>
+    <p class="footer">© VinhKhanh Tour 2025</p>
   </div>
 
   <script>
@@ -380,7 +380,7 @@
     // Cập nhật nội dung theo loại QR
     if (!id) {
       document.getElementById('card-label').textContent  = 'Đăng nhập';
-      document.getElementById('card-title').innerHTML    = 'Vào ứng dụng<br><span>GPS Tour</span>';
+      document.getElementById('card-title').innerHTML    = 'Vào ứng dụng<br><span>VinhKhanh Tour</span>';
       document.getElementById('card-desc').textContent   = 'Khám phá ẩm thực và văn hoá phố Vĩnh Khánh ngay trên điện thoại.';
     }
 
