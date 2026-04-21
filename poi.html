@@ -4,91 +4,403 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GPS Tour – Vĩnh Khánh</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-    body{background:#0A0F0D;color:white;display:flex;flex-direction:column;
-         align-items:center;justify-content:center;min-height:100vh;padding:28px;text-align:center}
-    .icon{font-size:52px;margin-bottom:16px}
-    h1{font-size:20px;font-weight:700;color:#C9A84C;margin-bottom:6px}
-    .sub{font-size:13px;color:#475569;margin-bottom:32px}
-    .btn{display:block;width:100%;max-width:300px;padding:16px;
-         border-radius:10px;font-size:15px;font-weight:600;
-         text-decoration:none;margin:10px auto;border:none;cursor:pointer}
-    .btn-open{background:#C9A84C;color:#080D14}
-    .btn-dl{background:#1d4ed8;color:white}
-    .btn-skip{background:transparent;border:1px solid #1E2D3F;
-              color:#475569;font-size:13px;padding:12px}
-    .spinner{width:36px;height:36px;border:3px solid #1E2D3F;
-             border-top-color:#C9A84C;border-radius:50%;
-             animation:spin .8s linear infinite;margin:0 auto 14px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .status{font-size:14px;color:#C9A84C;margin-bottom:20px}
-    .hint{font-size:12px;color:#475569;margin-top:20px;line-height:1.8}
-    .hint b{color:#94a3b8}
-    .divider{font-size:11px;color:#1E2D3F;margin:8px 0}
-    .hidden{display:none}
+    :root {
+      --gold: #B8960C;
+      --gold-light: #D4AF37;
+      --gold-dim: rgba(184,150,12,0.15);
+      --bg: #080A08;
+      --bg2: #0E120E;
+      --border: rgba(184,150,12,0.2);
+      --text: #F0EDE6;
+      --muted: #5A5A52;
+      --muted2: #3A3A34;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,150,12,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(184,150,12,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* Logo / wordmark */
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+
+    .wordmark-line {
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    .wordmark-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+    }
+
+    /* Card */
+    .card {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+      opacity: 0.6;
+    }
+
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .card-title span {
+      color: var(--gold-light);
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .divider-line { flex:1; height:1px; background: var(--muted2); }
+    .divider-text { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* Buttons */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      background: var(--gold);
+      color: #080A08;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      text-align: center;
+      border: none;
+      border-radius: 1px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--gold-light); }
+    .btn-primary:hover::after { opacity: 1; }
+    .btn-primary:active { transform: scale(0.99); }
+
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      padding: 15px 24px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      text-align: center;
+      border: 1px solid var(--muted2);
+      border-radius: 1px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    .btn-ghost {
+      display: block;
+      width: 100%;
+      padding: 13px 24px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      margin-top: 8px;
+    }
+    .btn-ghost:hover { color: var(--text); }
+
+    /* Loading state */
+    .loading-wrap {
+      text-align: center;
+      padding: 8px 0 24px;
+    }
+
+    .loader {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--muted2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .loading-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 20px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* Install hint */
+    .install-hint {
+      margin-top: 24px;
+      padding: 16px;
+      border: 1px solid var(--muted2);
+      border-radius: 1px;
+    }
+
+    .install-hint-title {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .install-hint-text {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .install-hint-text b { color: #7A7A72; font-weight: 400; }
+
+    .hidden { display: none !important; }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--muted2);
+      letter-spacing: 0.1em;
+    }
   </style>
 </head>
 <body>
-  <div class="icon" id="page-icon">🗺️</div>
-  <h1>GPS Tour · Vĩnh Khánh</h1>
-  <p class="sub" id="page-sub">Đang xử lý...</p>
+  <div class="container">
 
-  <!-- Trạng thái 1: Chờ bấm -->
-  <div id="state-ready">
-    <button class="btn btn-open" onclick="openApp()">
-      🚀 Mở trong GPS Tour App
-    </button>
-    <p class="divider">— chưa cài app? —</p>
-    <a class="btn btn-dl"
-       href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-      ⬇️ Tải GPS Tour APK
-    </a>
-    <p class="hint">
-      Tải APK về → mở file để cài đặt<br>
-      Nếu bị chặn → <b>Cài đặt → Bảo mật</b><br>
-      → bật <b>Cho phép cài từ nguồn khác</b>
-    </p>
-  </div>
+    <div class="wordmark">
+      <div class="wordmark-line"></div>
+      <span class="wordmark-text">GPS Tour · Vĩnh Khánh</span>
+      <div class="wordmark-line"></div>
+    </div>
 
-  <!-- Trạng thái 2: Đang mở app -->
-  <div id="state-opening" class="hidden">
-    <div class="spinner"></div>
-    <p class="status">Đang mở GPS Tour...</p>
-    <p style="font-size:13px;color:#334155;margin-bottom:24px">
-      Không mở được? App chưa được cài.
-    </p>
-    <a class="btn btn-dl"
-       href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-      ⬇️ Tải GPS Tour APK
-    </a>
-    <button class="btn btn-skip" onclick="goBack()">
-      ← Quay lại
-    </button>
+    <div class="card">
+
+      <!-- State 1: Ready -->
+      <div id="state-ready">
+        <p class="card-label" id="card-label">Điểm tham quan</p>
+        <h1 class="card-title" id="card-title">Mở ứng dụng<br><span>GPS Tour</span></h1>
+        <p class="card-desc" id="card-desc">Nghe thuyết minh và chỉ đường tự động ngay khi vào app.</p>
+
+        <a class="btn-primary" id="btn-open-app" href="#">
+          Mở trong GPS Tour
+        </a>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">Chưa cài</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <a class="btn-secondary"
+           href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
+          Tải GPS Tour APK
+        </a>
+
+        <div class="install-hint">
+          <p class="install-hint-title">Hướng dẫn cài đặt</p>
+          <p class="install-hint-text">
+            Tải file APK về → mở để cài đặt<br>
+            Nếu bị chặn → <b>Cài đặt → Bảo mật</b><br>
+            → bật <b>Cài từ nguồn không xác định</b>
+          </p>
+        </div>
+      </div>
+
+      <!-- State 2: Opening -->
+      <div id="state-opening" class="hidden">
+        <div class="loading-wrap">
+          <div class="loader"></div>
+          <p class="loading-text">Đang mở GPS Tour</p>
+        </div>
+        <p class="loading-sub">
+          Nếu không mở được, ứng dụng chưa được<br>cài trên thiết bị này.
+        </p>
+        <a class="btn-secondary"
+           href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
+          Tải GPS Tour APK
+        </a>
+        <button class="btn-ghost" onclick="goBack()">Quay lại</button>
+      </div>
+
+    </div>
+
+    <p class="footer">© GPS Tour · Vĩnh Khánh 2025</p>
   </div>
 
   <script>
     const id = new URLSearchParams(location.search).get('id');
 
-    // Nếu có ?id= → QR POI, không có → QR Login
     const scheme = id
       ? `vinhkhanhtour://poi/${id}?autoplay=true`
       : `vinhkhanhtour://open/guest`;
 
-    // Cập nhật text theo loại QR
-    if (id) {
-      document.getElementById('page-icon').textContent = '📍';
-      document.getElementById('page-sub').textContent  = 'Nghe thuyết minh & chỉ đường tự động';
-    } else {
-      document.getElementById('page-icon').textContent = '🗺️';
-      document.getElementById('page-sub').textContent  = 'Quét để vào GPS Tour App';
+    const intentUrl = id
+      ? `intent://poi/${id}?autoplay=true#Intent;scheme=vinhkhanhtour;package=com.companyname.vinhkhanhtour;S.browser_fallback_url=${encodeURIComponent(location.href)};end`
+      : `intent://open/guest#Intent;scheme=vinhkhanhtour;package=com.companyname.vinhkhanhtour;S.browser_fallback_url=${encodeURIComponent(location.href)};end`;
+
+    // Cập nhật nội dung theo loại QR
+    if (!id) {
+      document.getElementById('card-label').textContent  = 'Đăng nhập';
+      document.getElementById('card-title').innerHTML    = 'Vào ứng dụng<br><span>GPS Tour</span>';
+      document.getElementById('card-desc').textContent   = 'Khám phá ẩm thực và văn hoá phố Vĩnh Khánh ngay trên điện thoại.';
     }
 
-    function openApp() {
-      document.getElementById('state-ready').classList.add('hidden');
-      document.getElementById('state-opening').classList.remove('hidden');
-      // Người dùng đã bấm → browser cho phép mở custom scheme
-      window.location.href = scheme;
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const btnOpen   = document.getElementById('btn-open-app');
+
+    if (isAndroid) {
+      btnOpen.href = intentUrl;
+      btnOpen.addEventListener('click', function() {
+        document.getElementById('state-ready').classList.add('hidden');
+        document.getElementById('state-opening').classList.remove('hidden');
+      });
+    } else {
+      btnOpen.href = '#';
+      btnOpen.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('state-ready').classList.add('hidden');
+        document.getElementById('state-opening').classList.remove('hidden');
+        window.location.href = scheme;
+      });
     }
 
     function goBack() {
