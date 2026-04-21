@@ -9,65 +9,92 @@
     body{background:#0A0F0D;color:white;display:flex;flex-direction:column;
          align-items:center;justify-content:center;min-height:100vh;padding:28px;text-align:center}
     .icon{font-size:52px;margin-bottom:16px}
-    h1{font-size:20px;font-weight:700;color:#4A8A56;margin-bottom:6px}
+    h1{font-size:20px;font-weight:700;color:#C9A84C;margin-bottom:6px}
     .sub{font-size:13px;color:#475569;margin-bottom:32px}
-    .spinner{width:36px;height:36px;border:3px solid #1A2E1E;
-             border-top-color:#4A8A56;border-radius:50%;
-             animation:spin .8s linear infinite;margin:0 auto 14px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .status{font-size:14px;color:#4A8A56;margin-bottom:0}
     .btn{display:block;width:100%;max-width:300px;padding:16px;
          border-radius:10px;font-size:15px;font-weight:600;
          text-decoration:none;margin:10px auto;border:none;cursor:pointer}
+    .btn-open{background:#C9A84C;color:#080D14}
     .btn-dl{background:#1d4ed8;color:white}
-    .btn-open{background:#4A8A56;color:white}
+    .btn-skip{background:transparent;border:1px solid #1E2D3F;
+              color:#475569;font-size:13px;padding:12px}
+    .spinner{width:36px;height:36px;border:3px solid #1E2D3F;
+             border-top-color:#C9A84C;border-radius:50%;
+             animation:spin .8s linear infinite;margin:0 auto 14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .status{font-size:14px;color:#C9A84C;margin-bottom:20px}
     .hint{font-size:12px;color:#475569;margin-top:20px;line-height:1.8}
     .hint b{color:#94a3b8}
+    .divider{font-size:11px;color:#1E2D3F;margin:8px 0}
     .hidden{display:none}
   </style>
 </head>
 <body>
-  <div class="icon">📍</div>
+  <div class="icon" id="page-icon">🗺️</div>
   <h1>GPS Tour · Vĩnh Khánh</h1>
-  <p class="sub">Quét để nghe thuyết minh &amp; chỉ đường</p>
+  <p class="sub" id="page-sub">Đang xử lý...</p>
 
-  <div id="state-loading">
-    <div class="spinner"></div>
-    <p class="status">Đang mở ứng dụng...</p>
-  </div>
-
-  <div id="state-no-app" class="hidden">
-    <p style="color:#94a3b8;font-size:14px;margin-bottom:24px">
-      Bạn chưa cài <strong style="color:white">GPS Tour</strong>
-    </p>
-    <a id="btn-dl" class="btn btn-dl"
+  <!-- Trạng thái 1: Chờ bấm -->
+  <div id="state-ready">
+    <button class="btn btn-open" onclick="openApp()">
+      🚀 Mở trong GPS Tour App
+    </button>
+    <p class="divider">— chưa cài app? —</p>
+    <a class="btn btn-dl"
        href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
       ⬇️ Tải GPS Tour APK
     </a>
-    <a id="btn-open" class="btn btn-open" href="#">
-      ✅ Đã cài rồi → Mở app
-    </a>
     <p class="hint">
-      Sau khi tải về, mở file APK để cài đặt.<br>
+      Tải APK về → mở file để cài đặt<br>
       Nếu bị chặn → <b>Cài đặt → Bảo mật</b><br>
       → bật <b>Cho phép cài từ nguồn khác</b>
     </p>
   </div>
 
+  <!-- Trạng thái 2: Đang mở app -->
+  <div id="state-opening" class="hidden">
+    <div class="spinner"></div>
+    <p class="status">Đang mở GPS Tour...</p>
+    <p style="font-size:13px;color:#334155;margin-bottom:24px">
+      Không mở được? App chưa được cài.
+    </p>
+    <a class="btn btn-dl"
+       href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
+      ⬇️ Tải GPS Tour APK
+    </a>
+    <button class="btn btn-skip" onclick="goBack()">
+      ← Quay lại
+    </button>
+  </div>
+
   <script>
-    const id     = new URLSearchParams(location.search).get('id') || '1';
-    const scheme = `vinhkhanhtour://poi/${id}?autoplay=true`;
+    const id = new URLSearchParams(location.search).get('id');
 
-    document.getElementById('btn-open').href = scheme;
+    // Nếu có ?id= → QR POI, không có → QR Login
+    const scheme = id
+      ? `vinhkhanhtour://poi/${id}?autoplay=true`
+      : `vinhkhanhtour://open/guest`;
 
-    // Thử mở app ngay
-    window.location.href = scheme;
+    // Cập nhật text theo loại QR
+    if (id) {
+      document.getElementById('page-icon').textContent = '📍';
+      document.getElementById('page-sub').textContent  = 'Nghe thuyết minh & chỉ đường tự động';
+    } else {
+      document.getElementById('page-icon').textContent = '🗺️';
+      document.getElementById('page-sub').textContent  = 'Quét để vào GPS Tour App';
+    }
 
-    // Sau 2.5s vẫn ở trang này → chưa cài app
-    setTimeout(() => {
-      document.getElementById('state-loading').classList.add('hidden');
-      document.getElementById('state-no-app').classList.remove('hidden');
-    }, 2500);
+    function openApp() {
+      document.getElementById('state-ready').classList.add('hidden');
+      document.getElementById('state-opening').classList.remove('hidden');
+      // Người dùng đã bấm → browser cho phép mở custom scheme
+      window.location.href = scheme;
+    }
+
+    function goBack() {
+      document.getElementById('state-opening').classList.add('hidden');
+      document.getElementById('state-ready').classList.remove('hidden');
+    }
   </script>
 </body>
 </html>
