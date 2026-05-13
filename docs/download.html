@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tải App - Vĩnh Khánh Tour</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+  :root{
+    --bg:#0A0F0D;--surface:#0F1A12;--border:#1A2E1E;
+    --accent:#4A8A56;--accent2:#2E4A35;--text:#ffffff;--muted:#6B8F74;
+  }
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 16px 48px}
+
+  /* ── Header ── */
+  .header{width:100%;max-width:480px;padding:48px 0 24px;text-align:center}
+  .logo{font-size:13px;font-weight:700;letter-spacing:.2em;color:var(--muted);margin-bottom:20px}
+  .header h1{font-size:26px;font-weight:800;line-height:1.3}
+  .header p{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6}
+
+  /* ── Detect card ── */
+  .card{width:100%;max-width:480px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;margin-top:24px;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(74,138,86,.06) 0%,transparent 60%);pointer-events:none}
+
+  .section-label{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--muted);margin-bottom:16px;text-transform:uppercase}
+
+  /* ── Benchmark bar ── */
+  .bench-wrap{margin:16px 0}
+  .bench-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .bench-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+  .bench-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+  /* ── Status badge ── */
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.08em;margin-top:16px}
+  .badge.high{background:rgba(74,138,86,.15);border:1px solid var(--accent);color:var(--accent)}
+  .badge.low{background:rgba(255,180,0,.08);border:1px solid #c8960088;color:#c89600}
+  .badge .dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.4s infinite}
+  .badge.high .dot{background:var(--accent)}
+  .badge.low .dot{background:#c89600}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* ── Spec rows ── */
+  .spec-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+  .spec-row:last-child{border-bottom:none}
+  .spec-key{font-size:12px;color:var(--muted)}
+  .spec-val{font-size:12px;font-weight:600;color:var(--text)}
+
+  /* ── Audio section ── */
+  .audio-grid{display:grid;gap:10px;margin-top:4px}
+  .audio-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color .2s}
+  .audio-item.active{border-color:var(--accent)}
+  .audio-icon{width:36px;height:36px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+  .audio-item.active .audio-icon{background:rgba(74,138,86,.2)}
+  .audio-info{flex:1;min-width:0}
+  .audio-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .audio-meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .audio-size{font-size:11px;color:var(--accent);font-weight:600}
+
+  /* Progress */
+  .dl-track{height:3px;background:var(--border);border-radius:99px;margin-top:8px;overflow:hidden}
+  .dl-fill{height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .4s linear}
+
+  /* ── Placeholder (low-end) ── */
+  .placeholder-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center}
+  .placeholder-value{font-size:48px;font-weight:800;color:var(--accent);line-height:1}
+  .placeholder-label{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.1em}
+  .bit-row{display:flex;justify-content:center;gap:12px;margin-top:12px}
+  .bit{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;border:1px solid var(--border);background:var(--surface);transition:.3s}
+  .bit.on{background:rgba(74,138,86,.2);border-color:var(--accent);color:var(--accent)}
+  .bit.off{color:var(--muted)}
+
+  /* ── Download button ── */
+  .btn-dl{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;border-radius:12px;background:var(--accent);border:none;color:#fff;font-size:14px;font-weight:700;letter-spacing:.08em;cursor:pointer;margin-top:20px;transition:opacity .2s,transform .15s}
+  .btn-dl:hover{opacity:.88;transform:translateY(-1px)}
+  .btn-dl:active{transform:translateY(0)}
+  .btn-dl:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+  .hint{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
+  .analyzing{text-align:center;padding:24px 0;color:var(--muted);font-size:13px;animation:fadeIn .4s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🗺️ VĨNH KHÁNH TOUR</div>
+  <h1>Tải ứng dụng<br>Audio Guide</h1>
+  <p>Hệ thống tự phân tích thiết bị<br>để cài đặt phù hợp nhất</p>
+</div>
+
+<!-- Card 1: Phân tích thiết bị -->
+<div class="card" id="card-detect">
+  <div class="section-label">Phân tích thiết bị</div>
+  <div class="analyzing" id="analyzing-state">
+    <div class="spinner"></div>
+    Đang đo hiệu năng thiết bị...
+  </div>
+  <div id="result-state" style="display:none">
+    <div class="bench-wrap">
+      <div class="bench-label"><span>CPU Score</span><span id="score-label">—</span></div>
+      <div class="bench-track"><div class="bench-fill" id="bench-fill"></div></div>
+    </div>
+
+    <div id="badge-container"></div>
+
+    <div style="margin-top:20px">
+      <div class="spec-row"><span class="spec-key">Loại thiết bị</span><span class="spec-val" id="s-type">—</span></div>
+      <div class="spec-row"><span class="spec-key">CPU Cores</span><span class="spec-val" id="s-cores">—</span></div>
+      <div class="spec-row"><span class="spec-key">RAM (ước tính)</span><span class="spec-val" id="s-ram">—</span></div>
+      <div class="spec-row"><span class="spec-key">Kết nối mạng</span><span class="spec-val" id="s-net">—</span></div>
+      <div class="spec-row"><span class="spec-key">Chế độ tải</span><span class="spec-val" id="s-mode">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 2: Nội dung tải -->
+<div class="card" id="card-content" style="display:none;margin-top:16px">
+  <div class="section-label" id="content-label">Nội dung</div>
+  <div id="content-area"></div>
+  <button class="btn-dl" id="btn-download" onclick="startDownload()">⬇ Tải APK ngay</button>
+  <p class="hint" id="dl-hint">Dung lượng tổng sẽ được hiển thị sau khi phân tích</p>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  CẤU HÌNH — chỉnh theo repo GitHub Pages của bạn
+// ══════════════════════════════════════════════════
+const CONFIG = {
+  apkUrl: 'https://nhu154.github.io/gps-tour/VinhKhanhTour.apk',
+  audioBaseUrl: 'https://nhu154.github.io/gps-tour/audio/',
+  // Danh sách file audio cho máy mạnh
+  audioFiles: [
+    { name: 'Giới thiệu Vĩnh Khánh',  file: 'intro_vi.mp3',    size: '2.1 MB' },
+    { name: 'Quán Hải Sản Bình Dân',   file: 'poi_1_vi.mp3',    size: '1.4 MB' },
+    { name: 'Lẩu Cá Kèo Mười Chức',   file: 'poi_2_vi.mp3',    size: '1.6 MB' },
+    { name: 'Bánh Xèo Bà Tư',          file: 'poi_3_vi.mp3',    size: '0.9 MB' },
+    { name: 'Bún Mắm Cô Liên',         file: 'poi_4_vi.mp3',    size: '1.1 MB' },
+    { name: 'Intro English',            file: 'intro_en.mp3',    size: '2.3 MB' },
+    { name: 'Intro 中文',               file: 'intro_zh.mp3',    size: '2.0 MB' },
+  ],
+  // Ngưỡng CPU score để phân loại
+  highEndThreshold: 60,
+};
+
+// ── Benchmark CPU (đo thời gian tính toán) ──────────
+function runCpuBenchmark() {
+  const start = performance.now();
+  let sum = 0;
+  // ~2M vòng lặp toán học
+  for (let i = 0; i < 2_000_000; i++) {
+    sum += Math.sqrt(i) * Math.sin(i * 0.001);
+  }
+  const ms = performance.now() - start;
+  // Score ngược (càng nhanh → score cao), clamp 0–100
+  const score = Math.max(0, Math.min(100, Math.round(100 - ms / 2)));
+  return { score, ms: Math.round(ms), checksum: sum };
+}
+
+// ── Detect thông tin máy ─────────────────────────────
+function detectDevice() {
+  const cores = navigator.hardwareConcurrency || 2;
+  const ram   = navigator.deviceMemory        || 1;   // GB, chỉ có trên Chrome Android
+  const conn  = navigator.connection;
+  const netType = conn ? (conn.effectiveType || conn.type || '4g') : '4g';
+  return { cores, ram, netType };
+}
+
+// ── Random subset audio ──────────────────────────────
+function randomAudioSubset(files, count) {
+  const shuffled = [...files].sort(() => Math.random() - .5);
+  return shuffled.slice(0, Math.min(count, files.length));
+}
+
+// ── Render kết quả ───────────────────────────────────
+let _isHighEnd = false;
+let _selectedAudio = [];
+
+function renderResult(score, info) {
+  _isHighEnd = score >= CONFIG.highEndThreshold;
+
+  // Fill thanh benchmark
+  const fill = document.getElementById('bench-fill');
+  setTimeout(() => { fill.style.width = score + '%'; }, 100);
+  document.getElementById('score-label').textContent = score + ' / 100';
+
+  // Badge
+  const badge = document.createElement('div');
+  badge.className = 'badge ' + (_isHighEnd ? 'high' : 'low');
+  badge.innerHTML = `<span class="dot"></span>${_isHighEnd ? '🚀 Máy mạnh — Full Audio' : '⚡ Máy yếu — Lite Mode'}`;
+  document.getElementById('badge-container').appendChild(badge);
+
+  // Spec rows
+  document.getElementById('s-type').textContent  = _isHighEnd ? 'High-end' : 'Low-end';
+  document.getElementById('s-cores').textContent = info.cores + ' core' + (info.cores > 1 ? 's' : '');
+  document.getElementById('s-ram').textContent   = info.ram >= 4 ? info.ram + ' GB' : '< 4 GB';
+  document.getElementById('s-net').textContent   = info.netType.toUpperCase();
+  document.getElementById('s-mode').textContent  = _isHighEnd ? 'Full Bundle' : 'Lite (0 / 1)';
+
+  // Hiện card content
+  document.getElementById('analyzing-state').style.display = 'none';
+  document.getElementById('result-state').style.display    = 'block';
+  document.getElementById('card-content').style.display    = 'block';
+
+  if (_isHighEnd) renderHighEnd();
+  else            renderLowEnd();
+}
+
+// ── HIGH-END: hiển thị audio ngẫu nhiên ─────────────
+function renderHighEnd() {
+  document.getElementById('content-label').textContent = 'Audio Files (Random Full Bundle)';
+  const area = document.getElementById('content-area');
+
+  // Chọn ngẫu nhiên tất cả file (hoặc subset nếu muốn)
+  _selectedAudio = randomAudioSubset(CONFIG.audioFiles, CONFIG.audioFiles.length);
+
+  const grid = document.createElement('div');
+  grid.className = 'audio-grid';
+
+  _selectedAudio.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'audio-item';
+    item.id = 'audio-item-' + i;
+    item.innerHTML = `
+      <div class="audio-icon">🎵</div>
+      <div class="audio-info">
+        <div class="audio-name">${f.name}</div>
+        <div class="audio-meta">${f.file}</div>
+        <div class="dl-track"><div class="dl-fill" id="dl-fill-${i}"></div></div>
+      </div>
+      <div class="audio-size">${f.size}</div>`;
+    grid.appendChild(item);
+  });
+
+  area.appendChild(grid);
+  document.getElementById('dl-hint').textContent =
+    `${_selectedAudio.length} file audio · Full chất lượng HD`;
+}
+
+// ── LOW-END: giả lập bit 0/1 ─────────────────────────
+function renderLowEnd() {
+  document.getElementById('content-label').textContent = 'Lite Mode — Placeholder';
+  const area = document.getElementById('content-area');
+
+  const bits = [
+    Math.round(Math.random()),  // 0 hoặc 1 ngẫu nhiên
+    Math.round(Math.random()),
+  ];
+
+  area.innerHTML = `
+    <div class="placeholder-box">
+      <div class="placeholder-value">${bits[0]}</div>
+      <div class="placeholder-label">GIÁ TRỊ GIẢ LẬP LITE</div>
+      <div class="bit-row">
+        ${bits.map(b => `<div class="bit ${b===1?'on':'off'}">${b}</div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:#6B8F74;margin-top:14px;line-height:1.6">
+        Máy yếu → chỉ tải APK cơ bản<br>
+        Audio sẽ stream trực tiếp khi dùng
+      </div>
+    </div>`;
+
+  document.getElementById('dl-hint').textContent =
+    'APK lite · Không tải audio sẵn · Stream khi cần';
+  document.getElementById('btn-download').textContent = '⬇ Tải APK Lite';
+
+  // Blink animation cho bit
+  bits.forEach((b, i) => {
+    const el = area.querySelectorAll('.bit')[i];
+    if (!el) return;
+    setInterval(() => {
+      const newVal = Math.round(Math.random());
+      el.className = 'bit ' + (newVal === 1 ? 'on' : 'off');
+      el.textContent = newVal;
+    }, 1800 + i * 400);
+  });
+}
+
+// ── Giả lập tải xuống ────────────────────────────────
+function startDownload() {
+  const btn = document.getElementById('btn-download');
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang chuẩn bị...';
+
+  if (_isHighEnd) {
+    // Animate progress bars từng file
+    let i = 0;
+    const next = () => {
+      if (i >= _selectedAudio.length) {
+        btn.textContent = '✅ Hoàn tất! Mở file để cài đặt';
+        // Trigger tải APK thật
+        triggerApkDownload();
+        return;
+      }
+      const fill = document.getElementById('dl-fill-' + i);
+      const item = document.getElementById('audio-item-' + i);
+      if (item) item.classList.add('active');
+      btn.textContent = `⬇ Đang tải ${i + 1}/${_selectedAudio.length}...`;
+
+      let pct = 0;
+      const iv = setInterval(() => {
+        pct = Math.min(100, pct + Math.random() * 18 + 8);
+        if (fill) fill.style.width = pct + '%';
+        if (pct >= 100) { clearInterval(iv); i++; setTimeout(next, 300); }
+      }, 120);
+    };
+    setTimeout(next, 600);
+  } else {
+    // Lite: tải thẳng APK
+    setTimeout(() => {
+      btn.textContent = '✅ Đang tải APK Lite...';
+      triggerApkDownload();
+    }, 1000);
+  }
+}
+
+function triggerApkDownload() {
+  const a = document.createElement('a');
+  a.href = CONFIG.apkUrl;
+  a.download = 'VinhKhanhTour.apk';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ── Khởi động khi trang load ─────────────────────────
+window.addEventListener('load', () => {
+  // Chạy benchmark sau 200ms để đảm bảo UI render xong
+  setTimeout(() => {
+    const info = detectDevice();
+
+    // Chạy benchmark trong requestIdleCallback nếu có
+    const run = () => {
+      const { score } = runCpuBenchmark();
+      // Bonus: nếu ≥4 cores thì cộng điểm
+      const finalScore = Math.min(100, score + (info.cores >= 4 ? 10 : 0));
+      renderResult(finalScore, info);
+    };
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(run, { timeout: 2000 });
+    } else {
+      setTimeout(run, 400);
+    }
+  }, 200);
+});
+</script>
+</body>
+</html>
