@@ -1,412 +1,302 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPS Tour – Vĩnh Khánh</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --gold: #B8960C;
-      --gold-light: #D4AF37;
-      --gold-dim: rgba(184,150,12,0.15);
-      --bg: #080A08;
-      --bg2: #0E120E;
-      --border: rgba(184,150,12,0.2);
-      --text: #F0EDE6;
-      --muted: #5A5A52;
-      --muted2: #3A3A34;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPS Tour – Vĩnh Khánh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+:root{
+  --bg:#0A0F0D;--surface:#0F1A12;--border:#1A2E1E;
+  --accent:#4A8A56;--muted:#6B8F74;--text:#fff;--gold:#c89600;
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 16px 56px}
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+.header{width:100%;max-width:460px;padding:44px 0 20px;text-align:center}
+.logo-label{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--muted);margin-bottom:18px}
+.header h1{font-size:24px;font-weight:800;line-height:1.35}
+.header p{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      overflow-x: hidden;
-      position: relative;
-    }
+.card{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;margin-top:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(74,138,86,.05) 0%,transparent 60%);pointer-events:none}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--muted);margin-bottom:16px;text-transform:uppercase}
 
-    /* Background texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,150,12,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(184,150,12,0.05) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
+.analyzing{text-align:center;padding:20px 0}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.analyzing p{font-size:13px;color:var(--muted)}
 
-    /* Grain overlay */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
+.bench-wrap{margin-bottom:16px}
+.bench-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.bench-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.bench-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#2E4A35,var(--accent));transition:width 1s cubic-bezier(.4,0,.2,1)}
 
-    .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
-    }
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.07em;margin-bottom:18px}
+.badge.high{background:rgba(74,138,86,.15);border:1px solid var(--accent);color:var(--accent)}
+.badge.low{background:rgba(200,150,0,.08);border:1px solid #c8960088;color:var(--gold)}
+.badge .dot{width:7px;height:7px;border-radius:50%;animation:pulse 1.4s infinite}
+.badge.high .dot{background:var(--accent)}
+.badge.low .dot{background:var(--gold)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    @keyframes fadeUp {
-      from { opacity:0; transform: translateY(20px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
+.spec-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.spec-row:last-child{border-bottom:none}
+.spec-key{font-size:12px;color:var(--muted)}
+.spec-val{font-size:12px;font-weight:600}
 
-    /* Logo / wordmark */
-    .wordmark {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 48px;
-    }
+.open-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:12px;background:var(--accent);border:none;color:#fff;font-size:14px;font-weight:700;letter-spacing:.07em;cursor:pointer;margin-top:4px;text-decoration:none;transition:opacity .2s,transform .15s}
+.open-btn:hover{opacity:.88;transform:translateY(-1px)}
+.open-btn:active{transform:translateY(0)}
+.open-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-    .wordmark-line {
-      width: 32px;
-      height: 1px;
-      background: var(--gold);
-      opacity: 0.5;
-    }
+.sec-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;text-decoration:none;transition:border-color .2s,color .2s}
+.sec-btn:hover{border-color:var(--accent);color:var(--accent)}
 
-    .wordmark-text {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.25em;
-      color: var(--gold-light);
-      text-transform: uppercase;
-    }
+.audio-grid{display:grid;gap:9px;margin-top:14px}
+.audio-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:border-color .3s}
+.audio-item.ready{border-color:var(--accent)}
+.a-icon{width:34px;height:34px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.audio-item.ready .a-icon{background:rgba(74,138,86,.2)}
+.a-info{flex:1;min-width:0}
+.a-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.a-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.a-size{font-size:11px;color:var(--accent);font-weight:600;flex-shrink:0}
+.dl-track{height:2px;background:var(--border);border-radius:99px;margin-top:6px;overflow:hidden}
+.dl-fill{height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .4s linear}
 
-    /* Card */
-    .card {
-      width: 100%;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 40px 32px;
-      position: relative;
-      overflow: hidden;
-    }
+.bit-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;margin-bottom:16px}
+.bit-val{font-size:52px;font-weight:800;color:var(--accent);line-height:1}
+.bit-label{font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:.12em}
+.bit-row{display:flex;justify-content:center;gap:10px;margin-top:12px}
+.bit{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;border:1px solid var(--border);background:var(--surface);transition:.4s}
+.bit.on{background:rgba(74,138,86,.2);border-color:var(--accent);color:var(--accent)}
+.bit.off{color:var(--muted)}
 
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-      opacity: 0.6;
-    }
+.guide{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--muted);line-height:1.8;margin-top:12px}
+.guide strong{color:var(--text);font-weight:600}
 
-    .card-label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 300;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    .card-title span {
-      color: var(--gold-light);
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-      margin-bottom: 32px;
-      font-weight: 300;
-    }
-
-    /* Divider */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 24px 0;
-    }
-    .divider-line { flex:1; height:1px; background: var(--muted2); }
-    .divider-text { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-
-    /* Buttons */
-    .btn-primary {
-      display: block;
-      width: 100%;
-      padding: 16px 24px;
-      background: var(--gold);
-      color: #080A08;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      text-decoration: none;
-      text-align: center;
-      border: none;
-      border-radius: 1px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.1);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .btn-primary:hover { background: var(--gold-light); }
-    .btn-primary:hover::after { opacity: 1; }
-    .btn-primary:active { transform: scale(0.99); }
-
-    .btn-secondary {
-      display: block;
-      width: 100%;
-      padding: 15px 24px;
-      background: transparent;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 400;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      text-decoration: none;
-      text-align: center;
-      border: 1px solid var(--muted2);
-      border-radius: 1px;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--gold);
-      color: var(--gold-light);
-    }
-
-    .btn-ghost {
-      display: block;
-      width: 100%;
-      padding: 13px 24px;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.1em;
-      text-align: center;
-      border: none;
-      cursor: pointer;
-      transition: color 0.2s;
-      margin-top: 8px;
-    }
-    .btn-ghost:hover { color: var(--text); }
-
-    /* Loading state */
-    .loading-wrap {
-      text-align: center;
-      padding: 8px 0 24px;
-    }
-
-    .loader {
-      width: 28px;
-      height: 28px;
-      border: 1.5px solid var(--muted2);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-text {
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .loading-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 20px;
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    /* Install hint */
-    .install-hint { text-align: center;
-      margin-top: 24px;
-      padding: 16px;
-      border: 1px solid var(--muted2);
-      border-radius: 1px;
-    }
-
-    .install-hint-title {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .install-hint-text {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    .install-hint-text b { color: #7A7A72; font-weight: 400; }
-
-    .hidden { display: none !important; }
-
-    /* Footer */
-    .footer {
-      margin-top: 32px;
-      font-size: 11px;
-      color: var(--muted2);
-      letter-spacing: 0.1em;
-    }
-  </style>
+.footer{margin-top:40px;font-size:11px;color:var(--border);text-align:center}
+</style>
 </head>
 <body>
-  <div class="container">
 
-    <div class="wordmark">
-      <div class="wordmark-line"></div>
-      <span class="wordmark-text">VinhKhanh Tour</span>
-      <div class="wordmark-line"></div>
-    </div>
+<div class="header">
+  <div class="logo-label">🗺️ VĨNH KHÁNH TOUR</div>
+  <h1>Điểm tham quan<br>Audio Guide</h1>
+  <p>Nghe thuyết minh và chỉ đường tự động ngay khi vào app.</p>
+</div>
 
-    <div class="card">
-
-      <!-- State 1: Ready -->
-      <div id="state-ready">
-        <p class="card-label" id="card-label">Điểm tham quan</p>
-        <h1 class="card-title" id="card-title">Mở ứng dụng<br><span>VinhKhanh Tour</span></h1>
-        <p class="card-desc" id="card-desc">Nghe thuyết minh và chỉ đường tự động ngay khi vào app.</p>
-
-        <a class="btn-primary" id="btn-open-app" href="#">
-          Mở trong VinhKhanh Tour
-        </a>
-
-        <div class="divider">
-          <div class="divider-line"></div>
-          <span class="divider-text">Chưa cài</span>
-          <div class="divider-line"></div>
-        </div>
-
-        <a class="btn-secondary"
-           href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-          Tải VinhKhanh Tour APK
-        </a>
-
-        <div class="install-hint">
-          <p class="install-hint-title">Hướng dẫn cài đặt</p>
-          <p class="install-hint-text">
-            Tải file APK về → mở để cài đặt<br>
-            Nếu bị chặn → <b>Cài đặt → Bảo mật</b><br>
-            → bật <b>Cài từ nguồn không xác định</b>
-          </p>
-        </div>
-      </div>
-
-      <!-- State 2: Opening -->
-      <div id="state-opening" class="hidden">
-        <div class="loading-wrap">
-          <div class="loader"></div>
-          <p class="loading-text">Đang mở VinhKhanh Tour</p>
-        </div>
-        <p class="loading-sub">
-          Nếu không mở được, ứng dụng chưa được<br>cài trên thiết bị này.
-        </p>
-        <a class="btn-secondary"
-           href="https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg">
-          Tải VinhKhanh Tour APK
-        </a>
-        <button class="btn-ghost" onclick="goBack()">Quay lại</button>
-      </div>
-
-    </div>
-
-    <p class="footer">© VinhKhanh Tour 2025</p>
+<!-- Card 1: Phân tích máy -->
+<div class="card" id="card-detect">
+  <div class="card-label">Phân tích thiết bị</div>
+  <div class="analyzing" id="st-analyzing">
+    <div class="spinner"></div>
+    <p>Đang kiểm tra cấu hình máy...</p>
   </div>
+  <div id="st-result" style="display:none">
+    <div class="bench-wrap">
+      <div class="bench-row"><span>Hiệu năng CPU</span><span id="score-lbl">—</span></div>
+      <div class="bench-track"><div class="bench-fill" id="bench-fill"></div></div>
+    </div>
+    <div id="badge-wrap"></div>
+    <div id="spec-rows"></div>
+  </div>
+</div>
 
-  <script>
-    const id = new URLSearchParams(location.search).get('id');
+<!-- Card 2: Phương án phù hợp -->
+<div class="card" id="card-action" style="display:none">
+  <div class="card-label" id="action-label">Phương án</div>
+  <div id="action-area"></div>
+</div>
 
-    const scheme = id
-      ? `vinhkhanhtour://poi/${id}?autoplay=true`
-      : `vinhkhanhtour://open/guest`;
+<div class="footer">© VinhKhanh Tour 2025</div>
 
-    const intentUrl = id
-      ? `intent://poi/${id}?autoplay=true#Intent;scheme=vinhkhanhtour;package=com.companyname.vinhkhanhtour;S.browser_fallback_url=${encodeURIComponent(location.href)};end`
-      : `intent://open/guest#Intent;scheme=vinhkhanhtour;package=com.companyname.vinhkhanhtour;S.browser_fallback_url=${encodeURIComponent(location.href)};end`;
+<script>
+const APK_URL   = 'https://drive.google.com/uc?export=download&id=1OeHFtpZjamwrEByKXhm_-LX8a9nMM3Jg';
+const DEEP_LINK = 'vinhkhanhtour://poi/1?autoplay=true';
+const HIGH_THRESHOLD = 55;
 
-    // Cập nhật nội dung theo loại QR
-    if (!id) {
-      document.getElementById('card-label').textContent  = 'Đăng nhập';
-      document.getElementById('card-title').innerHTML    = 'Vào ứng dụng<br><span>VinhKhanh Tour</span>';
-      document.getElementById('card-desc').textContent   = 'Khám phá ẩm thực và văn hoá phố Vĩnh Khánh ngay trên điện thoại.';
+const AUDIO_FILES = [
+  { name:'Giới thiệu Vĩnh Khánh', file:'intro_vi.mp3',  size:'2.1 MB' },
+  { name:'Quán Hải Sản Bình Dân',  file:'poi_1_vi.mp3', size:'1.4 MB' },
+  { name:'Lẩu Cá Kèo Mười Chức',  file:'poi_2_vi.mp3', size:'1.6 MB' },
+  { name:'Bánh Xèo Bà Tư',         file:'poi_3_vi.mp3', size:'0.9 MB' },
+  { name:'Bún Mắm Cô Liên',        file:'poi_4_vi.mp3', size:'1.1 MB' },
+  { name:'English Intro',           file:'intro_en.mp3', size:'2.3 MB' },
+  { name:'中文介绍',                 file:'intro_zh.mp3', size:'2.0 MB' },
+];
+
+function benchmark() {
+  const t = performance.now();
+  let s = 0;
+  for (let i = 0; i < 2_000_000; i++) s += Math.sqrt(i) * Math.sin(i * 0.001);
+  const ms = performance.now() - t;
+  return Math.max(0, Math.min(100, Math.round(100 - ms / 2)));
+}
+
+function detect() {
+  return {
+    cores: navigator.hardwareConcurrency || 2,
+    ram:   navigator.deviceMemory        || 1,
+    net:   (navigator.connection?.effectiveType || '4g').toUpperCase(),
+  };
+}
+
+function renderSpecs(score, info, isHigh) {
+  document.getElementById('spec-rows').innerHTML = [
+    ['Phân loại',    isHigh ? 'Máy mạnh 🚀' : 'Máy yếu ⚡'],
+    ['CPU Cores',    info.cores + ' cores'],
+    ['RAM ước tính', info.ram >= 4 ? info.ram + ' GB' : '< 4 GB'],
+    ['Kết nối',      info.net],
+    ['Chế độ',       isHigh ? 'Full Audio Bundle' : 'Lite (0 / 1)'],
+  ].map(([k,v]) =>
+    `<div class="spec-row"><span class="spec-key">${k}</span><span class="spec-val">${v}</span></div>`
+  ).join('');
+}
+
+function renderHighEnd() {
+  document.getElementById('action-label').textContent = '🚀 Máy mạnh — Full Audio Bundle';
+  const area = document.getElementById('action-area');
+  area.innerHTML = `
+    <a href="${DEEP_LINK}" class="open-btn">🗺️ Mở VinhKhanh Tour ngay</a>
+    <div class="audio-grid" id="audio-grid"></div>
+    <button class="open-btn" id="btn-dl" onclick="downloadHighEnd()"
+      style="margin-top:14px;background:#1A2E1E;border:1px solid var(--accent)">
+      ⬇ Tải APK + Audio đầy đủ
+    </button>
+    <div class="guide">
+      <strong>Nếu chưa cài app:</strong> Nhấn "Tải APK" → cài đặt → quay lại quét QR.<br>
+      Bật <strong>Cài từ nguồn không xác định</strong> nếu hệ thống hỏi.
+    </div>`;
+
+  const grid = document.getElementById('audio-grid');
+  window._audioFiles = [...AUDIO_FILES].sort(() => Math.random() - .5);
+  window._audioFiles.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'audio-item';
+    div.id = 'ai-' + i;
+    div.innerHTML = `<div class="a-icon">🎵</div>
+      <div class="a-info">
+        <div class="a-name">${f.name}</div>
+        <div class="a-meta">${f.file}</div>
+        <div class="dl-track"><div class="dl-fill" id="df-${i}"></div></div>
+      </div>
+      <div class="a-size">${f.size}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderLowEnd() {
+  document.getElementById('action-label').textContent = '⚡ Máy yếu — Lite Mode';
+  const area = document.getElementById('action-area');
+  const b0 = Math.round(Math.random());
+  const b1 = Math.round(Math.random());
+  area.innerHTML = `
+    <div class="bit-box">
+      <div class="bit-val" id="bit-main">${b0}</div>
+      <div class="bit-label">GIÁ TRỊ GIẢ LẬP LITE</div>
+      <div class="bit-row">
+        <div class="bit ${b0?'on':'off'}" id="bit0">${b0}</div>
+        <div class="bit ${b1?'on':'off'}" id="bit1">${b1}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6">
+        Máy yếu → chỉ tải APK nhẹ, audio stream khi dùng
+      </div>
+    </div>
+    <a href="${APK_URL}" class="open-btn">⬇ Tải APK Lite</a>
+    <a href="${DEEP_LINK}" class="sec-btn">🗺️ Thử mở app (nếu đã cài)</a>
+    <div class="guide">
+      Tải APK → cài đặt → mở app → Audio tự stream khi đến từng điểm tham quan.
+    </div>`;
+
+  setInterval(() => {
+    const v = Math.round(Math.random());
+    const el = document.getElementById('bit0');
+    if(el){el.className='bit '+(v?'on':'off');el.textContent=v;}
+    const m = document.getElementById('bit-main');
+    if(m) m.textContent = v;
+  }, 1800);
+  setInterval(() => {
+    const v = Math.round(Math.random());
+    const el = document.getElementById('bit1');
+    if(el){el.className='bit '+(v?'on':'off');el.textContent=v;}
+  }, 2300);
+}
+
+let _dlRunning = false;
+function downloadHighEnd() {
+  if (_dlRunning) return;
+  _dlRunning = true;
+  const btn = document.getElementById('btn-dl');
+  if(btn) btn.disabled = true;
+  const files = window._audioFiles || AUDIO_FILES;
+  let i = 0;
+  const next = () => {
+    if (i >= files.length) {
+      if(btn) btn.textContent = '✅ Hoàn tất! Đang tải APK...';
+      triggerDl(APK_URL);
+      return;
     }
+    if(btn) btn.textContent = `⬇ Audio ${i+1}/${files.length}...`;
+    const fill = document.getElementById('df-' + i);
+    const item = document.getElementById('ai-' + i);
+    if(item) item.classList.add('ready');
+    if(item?.querySelector('.a-icon')) item.querySelector('.a-icon').textContent = '⬇';
+    let p = 0;
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.random()*18 + 8);
+      if(fill) fill.style.width = p + '%';
+      if(p >= 100){clearInterval(iv); i++; setTimeout(next, 280);}
+    }, 110);
+  };
+  setTimeout(next, 400);
+}
 
-    const isAndroid = /android/i.test(navigator.userAgent);
-    const btnOpen   = document.getElementById('btn-open-app');
+function triggerDl(url) {
+  const a = document.createElement('a');
+  a.href = url; a.download = '';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+}
 
-    if (isAndroid) {
-      btnOpen.href = intentUrl;
-      btnOpen.addEventListener('click', function() {
-        document.getElementById('state-ready').classList.add('hidden');
-        document.getElementById('state-opening').classList.remove('hidden');
-      });
-    } else {
-      btnOpen.href = '#';
-      btnOpen.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('state-ready').classList.add('hidden');
-        document.getElementById('state-opening').classList.remove('hidden');
-        window.location.href = scheme;
-      });
-    }
+window.addEventListener('load', () => {
+  // Thử tự mở app qua deep link
+  try { window.location.href = DEEP_LINK; } catch(_) {}
 
-    function goBack() {
-      document.getElementById('state-opening').classList.add('hidden');
-      document.getElementById('state-ready').classList.remove('hidden');
-    }
-  </script>
+  setTimeout(() => {
+    const info = detect();
+    const run = () => {
+      const raw   = benchmark();
+      const score = Math.min(100, raw + (info.cores >= 4 ? 10 : 0));
+      const isHigh = score >= HIGH_THRESHOLD;
+
+      setTimeout(() => {
+        document.getElementById('bench-fill').style.width = score + '%';
+      }, 80);
+      document.getElementById('score-lbl').textContent = score + ' / 100';
+
+      const badge = document.createElement('div');
+      badge.className = 'badge ' + (isHigh ? 'high' : 'low');
+      badge.innerHTML = `<span class="dot"></span>${isHigh ? '🚀 Máy mạnh — Full Audio' : '⚡ Máy yếu — Lite Mode'}`;
+      document.getElementById('badge-wrap').appendChild(badge);
+
+      renderSpecs(score, info, isHigh);
+
+      document.getElementById('st-analyzing').style.display = 'none';
+      document.getElementById('st-result').style.display    = 'block';
+      document.getElementById('card-action').style.display  = 'block';
+
+      if (isHigh) renderHighEnd();
+      else        renderLowEnd();
+    };
+
+    if (typeof requestIdleCallback !== 'undefined')
+      requestIdleCallback(run, { timeout: 2000 });
+    else
+      setTimeout(run, 400);
+  }, 300);
+});
+</script>
 </body>
 </html>
